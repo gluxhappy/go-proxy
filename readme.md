@@ -40,16 +40,20 @@ rules:
 
 Build with docker on Windows
 ```bat
-rem Build for Linux
-docker run -it --rm -v %CD%:/code -e GOOS=linux -w /code golang:1.21.5 go build -buildvcs=false
+rem Build for Linux amd64
+docker run -it --rm -v %CD%:/code -e GOOS=linux -e GOARCH=amd64 -w /code golang:1.21.5 go build -buildvcs=false -o go-proxy-linux-amd64
+rem Build for Linux amd64
+docker run -it --rm -v %CD%:/code -e GOOS=linux -e GOARCH=arm64 -w /code golang:1.21.5 go build -buildvcs=false -o go-proxy-linux-arm64
 rem Build for Windows
-docker run -it --rm -v %CD%:/code -e GOOS=windows -w /code golang:1.21.5 go build -buildvcs=false
+docker run -it --rm -v %CD%:/code -e GOOS=windows -e GOARCH=amd64 -w /code golang:1.21.5 go build -buildvcs=false -o go-proxy-windows-amd64.exe
 ```
 
 Build with docker on Linux
 ```sh
-# Build for Linux
-docker run -it --rm -v $(pwd):/code -e GOOS=linux -w /code golang:1.21.5 go build -buildvcs=false
+# Build for Linux amd64
+docker run -it --rm -v $(pwd):/code -e GOOS=linux -e GOARCH=amd64 -w /code golang:1.21.5 go build -buildvcs=false -o go-proxy-linux-amd64
+# Build for Linux amd64
+docker run -it --rm -v $(pwd):/code -e GOOS=linux -e GOARCH=arm64 -w /code golang:1.21.5 go build -buildvcs=false -o go-proxy-linux-arm64
 # Build for Windows
-docker run -it --rm -v $(pwd):/code -e GOOS=windows -w /code golang:1.21.5 go build -buildvcs=false
+docker run -it --rm -v $(pwd):/code -e GOOS=windows -e GOARCH=amd64 -w /code golang:1.21.5 go build -buildvcs=false -o go-proxy-windows-amd64.exe
 ```
