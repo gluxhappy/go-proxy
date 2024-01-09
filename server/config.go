@@ -16,17 +16,20 @@ type Rule struct {
 }
 
 type ServerConfig struct {
-	Host    string
-	Port    int
-	Geo     string
-	Proxies map[string]string
-	Rules   []Rule
+	Host           string
+	Port           int
+	Geo            string
+	AllowLocalhost bool  `yaml:"allow-localhost"`
+	SslPorts       []int `yaml:"ssl-ports"`
+	Proxies        map[string]string
+	Rules          []Rule
 }
 
 const EXAMPLE_CONFIG = `# Example config file
 host: 127.0.0.1
 port: 18888
 geo: GeoLite2-Country.mmdb
+allow-localhost: false # default: false
 proxies:
   fiddler: http://127.0.0.1:8888
   clash: http://127.0.0.1:33210

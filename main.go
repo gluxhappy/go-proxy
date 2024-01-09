@@ -17,7 +17,7 @@ func main() {
 		log.Fatal("Failed to load config:", err)
 		return
 	}
-	hostPort := config.Host + ":" + fmt.Sprint(config.Port)
+	hostPort := fmt.Sprintf("%s:%d", config.Host, config.Port)
 	// Start the proxy server
 	log.Println("Proxy server listening on " + hostPort)
 	proxyServer := server.MakeProxyServer(config)

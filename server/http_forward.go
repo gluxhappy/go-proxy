@@ -67,16 +67,18 @@ func (s *ProxyServer) handleHttpForward(host string, port string, w http.Respons
 		return
 
 	} else if proxyResult.proxy == "DIRECT" {
-		if resolvedHost, err := s.resolver.resolveHost(host); err == nil {
-			if resolvedHost.localhost {
-				log.Printf("%s %s %s DENIED/localhost\n", r.Method, r.Host, r.URL.Path)
-				http.Error(w, "Error forwarding request", http.StatusForbidden)
+		if !s.config.AllowLocalhost {
+			if resolvedHost, err := s.resolver.resolveHost(host); err == nil {
+				if resolvedHost.localhost {
+					log.Printf("%s %s %s DENIED/localhost\n", r.Method, r.Host, r.URL.Path)
+					http.Error(w, "Error forwarding request", http.StatusForbidden)
+					return
+				}
+			} else {
+				log.Printf("%s %s %s DENIED/unresolvable, %s\n", r.Method, r.Host, r.URL.Path, err)
+				http.Error(w, "Error forwarding request, unresolvable", http.StatusForbidden)
 				return
 			}
-		} else {
-			log.Printf("%s %s %s DENIED/unresolvable, %s\n", r.Method, r.Host, r.URL.Path, err)
-			http.Error(w, "Error forwarding request, unresolvable", http.StatusForbidden)
-			return
 		}
 		log.Printf("%s %s %s %s from %s\n", r.Method, r.Host, r.URL.Path, proxyResult.proxy, proxyResult.rule)
 	} else {

@@ -7,11 +7,26 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
 	"sync"
 )
 
 func (s *ProxyServer) handleHttpConnect(host string, port string, w http.ResponseWriter, r *http.Request) {
-	if port != "443" && port != "8443" {
+	intPort, err := strconv.Atoi(port)
+	if err != nil {
+		log.Println("CONNECT: " + r.URL.Host + " DENIED/ilegal-port:" + port)
+		http.Error(w, "The given port is not secure, DENY: "+r.Host, http.StatusForbidden)
+		return
+	}
+	safePort := false
+	for _, sslPort := range s.config.SslPorts {
+		if sslPort == intPort {
+			safePort = true
+			break
+		}
+	}
+
+	if !safePort {
 		log.Println("CONNECT: " + r.URL.Host + " DENIED/non-ssl-port:" + port)
 		http.Error(w, "The given port is not secure, DENY: "+r.Host, http.StatusForbidden)
 		return
@@ -28,16 +43,18 @@ func (s *ProxyServer) handleHttpConnect(host string, port string, w http.Respons
 		http.Error(w, "The given host is a denied, DENY: "+r.Host, http.StatusForbidden)
 		return
 	} else if proxyResult.proxy == "DIRECT" {
-		if resolveHost, err := s.resolver.resolveHost(host); err == nil {
-			if resolveHost.localhost {
-				log.Println("CONNECT: " + r.URL.Host + " DENIED/localhost")
-				http.Error(w, "The given host is a localhost, DENY: "+r.Host, http.StatusForbidden)
+		if !s.config.AllowLocalhost {
+			if resolveHost, err := s.resolver.resolveHost(host); err == nil {
+				if resolveHost.localhost {
+					log.Println("CONNECT: " + r.URL.Host + " DENIED/localhost")
+					http.Error(w, "The given host is a localhost, DENY: "+r.Host, http.StatusForbidden)
+					return
+				}
+			} else {
+				log.Println("CONNECT: "+r.URL.Host+" DENIED/unresolvable", err)
+				http.Error(w, "The given host is a unresolvable, DENY: "+r.Host, http.StatusForbidden)
 				return
 			}
-		} else {
-			log.Println("CONNECT: "+r.URL.Host+" DENIED/unresolvable", err)
-			http.Error(w, "The given host is a unresolvable, DENY: "+r.Host, http.StatusForbidden)
-			return
 		}
 		handleDirectConnect(proxyResult, host, port, w, r)
 	} else {
