@@ -4,7 +4,7 @@ An HTTP proxy implementation using Golang, support rules.
 
 ### Download
 
-[prebuilds](./releases)
+[prebuilds](https://github.com/gluxhappy/go-proxy/releases)
 
 ### Configuration
 
