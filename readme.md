@@ -10,11 +10,13 @@ Example configuration can be:
 # Example config file
 host: 127.0.0.1
 port: 18888
-geo: GeoLite2-Country.mmdb
+geo: GeoLite2-Country.mmdb # default: GeoLite2-Country.mmdb, path to GeoLite2-Country.mmdb
+allow-localhost: false # default: false, true to allow access to the localhost and loopback addresses
+ssl-ports: [443, 8443] # default: [443, 8443], safe ports for HTTP CONNECT
 proxies:
   fiddler: http://127.0.0.1:8888
   clash: http://127.0.0.1:33210
-  default: DIRECT # DENY
+  default: DIRECT # DENY, default proxy for unmatched requests
 rules:
   - name: "cn"
     type: "DOMAIN-SUFFIX"
